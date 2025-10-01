@@ -29,7 +29,6 @@ HEALTH_CHECK_INTERVAL = "30"
 LOG_LEVEL = "info"
 LOG_FORMAT = "json"
 NODE_ENV = "production"
-USERNAME = "katelya"
 
 # 预览环境配置
 [env.preview]
@@ -48,4 +47,3 @@ NEXT_PUBLIC_SITE_NAME = "KatelyaTV"
 NEXT_PUBLIC_SITE_DESCRIPTION = "高性能影视播放平台"
 IMAGE_PROXY_ENABLED = "true"
 NODE_ENV = "production"
-USERNAME = "katelya"
