@@ -1,5 +1,56 @@
 # Cloudflare Pages 部署指南
 
+## 🚨 500 Internal Server Error 解决方案
+
+### 问题：部署成功但运行时500错误
+
+**原因分析：**
+
+部署日志显示构建成功，但访问网站时出现500错误，通常是由于环境变量配置问题导致的运行时错误。
+
+**主要原因：**
+
+1. **USERNAME 环境变量缺失** - 这是最常见的原因
+2. D1 数据库绑定问题
+3. 其他关键环境变量未设置
+
+### 🎯 解决步骤
+
+#### 第一步：设置 USERNAME 环境变量
+
+在 Cloudflare Pages 控制台中：
+
+1. 进入您的项目设置
+2. 点击 "Settings" → "Environment variables"
+3. 添加新的环境变量：
+   - **Variable name**: `USERNAME`
+   - **Value**: `katelya` (您的站长用户名)
+   - **Environment**: Production 和 Preview 都要添加
+4. 点击 "Save"
+5. 重新部署项目
+
+#### 第二步：验证其他环境变量
+
+确保以下环境变量已正确设置：
+
+```bash
+# 必需变量
+USERNAME=katelya
+NEXT_PUBLIC_STORAGE_TYPE=d1
+NEXT_PUBLIC_SITE_NAME=KatelyaTV
+NODE_ENV=production
+
+# 推荐设置
+NEXTAUTH_URL=https://your-domain.pages.dev
+IMAGE_PROXY_ENABLED=true
+```
+
+#### 第三步：检查 D1 数据库绑定
+
+1. 确保在 Cloudflare Pages 中绑定了 D1 数据库
+2. 绑定名称应为 `DB`
+3. 数据库应已初始化（运行过初始化脚本）
+
 ## 部署问题修复
 
 ### 问题1：Edge Runtime 配置错误
@@ -126,9 +177,83 @@ export const runtime = 'edge';
 - `/api/debug/env` - 环境变量 (开发时)
 - 主页 `/` - 前端页面
 
+## 🔧 完整故障排除指南
+
+### 500错误诊断清单
+
+#### 1. 环境变量检查
+
+```bash
+# 在 Cloudflare Pages 控制台检查这些变量
+USERNAME=katelya                          # ❌ 最常缺失
+NEXT_PUBLIC_STORAGE_TYPE=d1              # ✅ 通常已设置
+NEXT_PUBLIC_SITE_NAME=KatelyaTV          # ✅ 通常已设置
+NODE_ENV=production                       # ✅ 通常已设置
+```
+
+#### 2. D1 数据库检查
+
+- [ ] D1 数据库是否已创建
+- [ ] 数据库是否正确绑定到 Pages 项目
+- [ ] 绑定名称是否为 `DB`
+- [ ] 数据库是否已初始化
+
+#### 3. 常见错误模式
+
+| 错误现象 | 原因 | 解决方案 |
+|---------|------|----------|
+| 500 + 管理页面无法访问 | USERNAME 未设置 | 添加 USERNAME 环境变量 |
+| 500 + 数据库相关错误 | D1 绑定问题 | 检查数据库绑定配置 |
+| 构建成功但运行失败 | 环境变量缺失 | 检查所有必需变量 |
+
+### 验证部署成功
+
+部署完成后访问以下端点验证：
+
+```bash
+# 1. 基本页面
+https://your-domain.pages.dev/          # 主页
+https://your-domain.pages.dev/login     # 登录页
+
+# 2. API 端点
+https://your-domain.pages.dev/api/server-config  # 服务器配置
+https://your-domain.pages.dev/api/debug/env      # 环境变量（开发时）
+
+# 3. 管理功能
+https://your-domain.pages.dev/admin     # 管理后台（需要正确的 USERNAME）
+```
+
+### 紧急恢复方案
+
+如果新部署出现问题：
+
+1. **立即回滚**
+
+   ```bash
+   # 在 Cloudflare Pages 控制台
+   Deployments → 选择之前的工作版本 → Rollback
+   ```
+
+2. **保留环境变量**
+
+   ```bash
+   # 记录当前所有环境变量配置
+   # 在新部署前先备份设置
+   ```
+
+3. **分步部署**
+
+   ```bash
+   # 1. 先部署代码（不修改环境变量）
+   # 2. 验证基本功能
+   # 3. 逐步添加/修改环境变量
+   ```
+
 ## 后续维护
 
 1. 定期更新依赖
 2. 监控部署日志
 3. 备份数据库配置
 4. 关注Cloudflare Pages更新
+5. 定期检查环境变量配置
+6. 监控网站运行状态
