@@ -37,6 +37,7 @@ HEALTH_CHECK_INTERVAL = "30"
 LOG_LEVEL = "info"
 LOG_FORMAT = "json"
 NODE_ENV = "production"
+PASSWORD = "0214465x"
 
 # 预览环境配置
 [env.preview]
@@ -66,3 +67,4 @@ HEALTH_CHECK_INTERVAL = "30"
 LOG_LEVEL = "info"
 LOG_FORMAT = "json"
 NODE_ENV = "production"
+PASSWORD = "0214465x"
